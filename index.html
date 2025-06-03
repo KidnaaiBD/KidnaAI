@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kidna AI Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eaf6ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    #start-btn {
+      padding: 15px 30px;
+      font-size: 20px;
+      background-color: #00aaff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #start-btn:hover {
+      background-color: #008ecc;
+    }
+
+    .form-step {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      min-width: 300px;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px;
+      font-size: 16px;
+      background-color: #00aaff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #welcome {
+      display: none;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <button id="start-btn">Explore Kidna AI</button>
+
+  <div class="form-step" id="step-name">
+    <input type="text" placeholder="Enter your name" id="name" />
+    <button onclick="nextStep('step-username')">Next</button>
+  </div>
+
+  <div class="form-step" id="step-username">
+    <input type="text" placeholder="Choose a username" id="username" />
+    <button onclick="nextStep('step-email')">Next</button>
+  </div>
+
+  <div class="form-step" id="step-email">
+    <input type="email" placeholder="Enter your email" id="email" />
+    <button onclick="nextStep('step-password')">Next</button>
+  </div>
+
+  <div class="form-step" id="step-password">
+    <input type="password" placeholder="Create a password" id="password" />
+    <button onclick="nextStep('step-birthdate')">Next</button>
+  </div>
+
+  <div class="form-step" id="step-birthdate">
+    <input type="date" id="birthdate" />
+    <button onclick="submitForm()">Login</button>
+  </div>
+
+  <div id="welcome">
+    <h2>Welcome to Kidna AI!</h2>
+    <p>You have successfully logged in.</p>
+  </div>
+
+  <script>
+    const steps = ['step-name', 'step-username', 'step-email', 'step-password', 'step-birthdate'];
+
+    document.getElementById('start-btn').onclick = () => {
+      document.getElementById('start-btn').style.display = 'none';
+      document.getElementById('step-name').style.display = 'flex';
+    };
+
+    function nextStep(nextId) {
+      for (const step of steps) {
+        document.getElementById(step).style.display = 'none';
+      }
+      document.getElementById(nextId).style.display = 'flex';
+    }
+
+    function submitForm() {
+      const name = document.getElementById('name').value;
+      const username = document.getElementById('username').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const birthdate = document.getElementById('birthdate').value;
+
+      if (!name || !username || !email || !password || !birthdate) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const user = { name, username, email, password, birthdate };
+      localStorage.setItem("kidnaUser", JSON.stringify(user));
+
+      for (const step of steps) {
+        document.getElementById(step).style.display = 'none';
+      }
+      document.getElementById('welcome').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
