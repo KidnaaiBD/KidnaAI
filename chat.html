@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kidna AI Chat</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="chat-box">
+    <h2>Chat with Kidna AI (Demo)</h2>
+    <div id="messages">
+      <p><b>AI:</b> Hello! How can I help you today?</p>
+    </div>
+    <input type="text" id="msg" placeholder="Type your message..." />
+    <button onclick="sendMsg()">Send</button>
+    <a href="dashboard.html">← Back to Dashboard</a>
+  </div>
+
+  <script>
+    function sendMsg() {
+      const msg = document.getElementById('msg').value;
+      if (!msg) return;
+      const box = document.getElementById('messages');
+      box.innerHTML += `<p><b>You:</b> ${msg}</p>`;
+      box.innerHTML += `<p><b>AI:</b> I'm just a demo now 😄</p>`;
+      document.getElementById('msg').value = '';
+      box.scrollTop = box.scrollHeight;
+    }
+  </script>
+</body>
+</html>

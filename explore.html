@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Explore - Kidna AI</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="explore-box">
+    <h2>🌍 Explore Fun Content</h2>
+    <ul>
+      <li>💡 Did you know? Octopuses have three hearts!</li>
+      <li>😂 “Why don’t scientists trust atoms? Because they make up everything.”</li>
+      <li>🎲 Roll a dice: You got <b id="dice"></b>! <button onclick="roll()">Roll Again</button></li>
+    </ul>
+    <a href="dashboard.html">← Back to Dashboard</a>
+  </div>
+
+  <script>
+    function roll() {
+      document.getElementById('dice').innerText = Math.ceil(Math.random() * 6);
+    }
+    roll();
+  </script>
+</body>
+</html>
