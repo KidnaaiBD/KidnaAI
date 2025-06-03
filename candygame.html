@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Candy Cash Drag & Drop</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #ffe6f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    user-select: none;
+  }
+  h1 {
+    color: #ff4d94;
+  }
+  #game {
+    display: grid;
+    grid-template-columns: repeat(6, 50px);
+    grid-template-rows: repeat(6, 50px);
+    gap: 5px;
+    margin-top: 20px;
+  }
+  .candy {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    cursor: grab;
+    transition: transform 0.2s;
+  }
+  .candy:active {
+    cursor: grabbing;
+  }
+  .red { background-color: #ff4d4d; }
+  .yellow { background-color: #ffe066; }
+  .green { background-color: #70d6ff; }
+  .purple { background-color: #c77dff; }
+  .orange { background-color: #ffa64d; }
+  #scoreboard {
+    margin-top: 20px;
+    font-size: 18px;
+    color: #333;
+  }
+  #level {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #ff4d94;
+  }
+</style>
+</head>
+<body>
+
+<h1>Candy Cash Drag & Drop</h1>
+<div id="scoreboard">Score: 0</div>
+<div id="level">Level: 1</div>
+<div id="game"></div>
+
+<script>
+  const colors = ['red', 'yellow', 'green', 'purple', 'orange'];
+  const gridSize = 6;
+  let score = 0;
+  let level = 1;
+
+  const gameBoard = document.getElementById('game');
+  const scoreBoard = document.getElementById('scoreboard');
+  const levelBoard = document.getElementById('level');
+
+  let board = [];
+
+  function initBoard() {
+    board = [];
+    gameBoard.innerHTML = '';
+    for (let i = 0; i < gridSize * gridSize; i++) {
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      board.push(color);
+      const candy = document.createElement('div');
+      candy.classList.add('candy', color);
+      candy.setAttribute('data-index', i);
+      candy.setAttribute('draggable', true);
+      candy.addEventListener('dragstart', dragStart);
+      candy.addEventListener('dragover', dragOver);
+      candy.addEventListener('drop', dropCandy);
+      candy.addEventListener('dragend', dragEnd);
+      gameBoard.appendChild(candy);
+    }
+  }
+
+  let dragStartIndex = null;
+
+  function dragStart(e) {
+    dragStartIndex = +this.getAttribute('data-index');
+  }
+
+  function dragOver(e) {
+    e.preventDefault(); // must prevent default to allow drop
+  }
+
+  function dropCandy(e) {
+    const dragEndIndex = +this.getAttribute('data-index');
+
+    // Check if neighbors
+    if (areNeighbors(dragStartIndex, dragEndIndex)) {
+      swapCandies(dragStartIndex, dragEndIndex);
+      if (!checkMatches()) {
+        swapCandies(dragStartIndex, dragEndIndex); // swap back if no match
+      } else {
+        removeMatches();
+        fillBoard();
+      }
+    }
+  }
+
+  function dragEnd() {
+    // Reset vars if needed
+  }
+
+  function swapCandies(i1, i2) {
+    const temp = board[i1];
+    board[i1] = board[i2];
+    board[i2] = temp;
+
+    const candy1 = gameBoard.children[i1];
+    const candy2 = gameBoard.children[i2];
+
+    candy1.className = 'candy ' + board[i1];
+    candy2.className = 'candy ' + board[i2];
+  }
+
+  function areNeighbors(i1, i2) {
+    if (i1 === i2) return false;
+    const row1 = Math.floor(i1 / gridSize);
+    const col1 = i1 % gridSize;
+    const row2 = Math.floor(i2 / gridSize);
+    const col2 = i2 % gridSize;
+    return (Math.abs(row1 - row2) + Math.abs(col1 - col2)) === 1;
+  }
+
+  function checkMatches() {
+    let matches = [];
+    for (let r = 0; r < gridSize; r++) {
+      for (let c = 0; c < gridSize - 2; c++) {
+        const i = r * gridSize + c;
+        if (board[i] === board[i + 1] && board[i] === board[i + 2]) {
+          matches.push(i, i + 1, i + 2);
+          let k = c + 3;
+          while (k < gridSize && board[r * gridSize + k] === board[i]) {
+            matches.push(r * gridSize + k);
+            k++;
+          }
+          c = k - 1;
+        }
+      }
+    }
+    for (let c = 0; c < gridSize; c++) {
+      for (let r = 0; r < gridSize - 2; r++) {
+        const i = r * gridSize + c;
+        if (board[i] === board[i + gridSize] && board[i] === board[i + 2 * gridSize]) {
+          matches.push(i, i + gridSize, i + 2 * gridSize);
+          let k = r + 3;
+          while (k < gridSize && board[k * gridSize + c] === board[i]) {
+            matches.push(k * gridSize + c);
+            k++;
+          }
+          r = k - 1;
+        }
+      }
+    }
+    if (matches.length > 0) {
+      matchedIndices = [...new Set(matches)];
+      return true;
+    } else {
+      matchedIndices = [];
+      return false;
+    }
+  }
+
+  let matchedIndices = [];
+
+  function removeMatches() {
+    for (let idx of matchedIndices) {
+      board[idx] = null;
+      gameBoard.children[idx].className = 'candy';
+      gameBoard.children[idx].style.backgroundColor = 'transparent';
+    }
+    score += matchedIndices.length * 10;
+    scoreBoard.textContent = 'Score: ' + score;
+  }
+
+  function fillBoard() {
+    for (let c = 0; c < gridSize; c++) {
+      let emptySpots = 0;
+      for (let r = gridSize - 1; r >= 0; r--) {
+        let idx = r * gridSize + c;
+        if (board[idx] === null) {
+          emptySpots++;
+        } else if (emptySpots > 0) {
+          board[(r + emptySpots) * gridSize + c] = board[idx];
+          board[idx] = null;
+        }
+      }
+      for (let r = 0; r < emptySpots; r++) {
+        board[r * gridSize + c] = colors[Math.floor(Math.random() * colors.length)];
+      }
+    }
+    for (let i = 0; i < board.length; i++) {
+      if (board[i] === null) {
+        gameBoard.children[i].className = 'candy';
+        gameBoard.children[i].style.backgroundColor = 'transparent';
+      } else {
+        gameBoard.children[i].className = 'candy ' + board[i];
+        gameBoard.children[i].style.backgroundColor = '';
+      }
+    }
+    setTimeout(() => {
+      if (checkMatches()) {
+        removeMatches();
+        fillBoard();
+      }
+    }, 300);
+  }
+
+  initBoard();
+  if (checkMatches()) {
+    removeMatches();
+    fillBoard();
+  }
+</script>
+
+</body>
+</html>
